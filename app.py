@@ -88,6 +88,31 @@ st.write(f"CTR: **{best_ad['CTR']:.2f}%**, CPC: **${best_ad['CPC']:.2f}**")
 
 st.write("This ad performed the best because it had a high Click-Through Rate (CTR) and a low Cost Per Click (CPC), indicating that it was both effective and cost-efficient.")
 
+# Calculate total budget
+total_budget = campaign_df['Spend'].sum()
+
+# Set a minimum threshold for the combined score
+min_threshold = 0.1
+
+# Adjust the combined scores to ensure no campaign has a score of zero
+campaign_df['adjusted_score'] = campaign_df['combined_score'].apply(lambda x: x if x > 0 else min_threshold)
+
+# Calculate the proportion of the budget for each campaign based on adjusted scores
+campaign_df['budget_proportion'] = campaign_df['adjusted_score'] / campaign_df['adjusted_score'].sum()
+
+# Calculate the new budget allocation
+campaign_df['new_budget'] = campaign_df['budget_proportion'] * total_budget
+
+st.subheader("💰 Budget Redistribution")
+
+# Display the new budget allocation
+st.write("Based on the performance metrics (CTR and CPC), the budget for the campaigns would be redistributed as follows:")
+st.dataframe(campaign_df[['Campaign Name', 'new_budget']])
+
+# Explanation of the budget redistribution
+st.write("The budget has been redistributed based on the combined score of CTR and CPC. Campaigns with higher combined scores receive a larger proportion of the budget, indicating better performance and cost-efficiency. A minimum threshold was applied to ensure a fair distribution.")
+
+
 st.subheader("📜 Raw Data")
 st.write("Campaign Performance Data (scroll right to see more columns)")
 st.dataframe(campaign_df)
